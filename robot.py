@@ -60,29 +60,22 @@ class MyRobot(wpilib.IterativeRobot):
             global fD, fluc, sD
             sD = self.gyro.getAngle()
             fD = sD - 90
-            fluc = 0.5
             firstTime = False
-            maxV = 0.7
-            minV = 0.6
+            v = 0.65
+
 
         cD = self.gyro.getAngle()
         # left smaller right bigger
-        while cD > (fD + fluc) or cD < (fD - fluc) :
+        if cD != fD :
             cD = self.gyro.getAngle()
-            needD  = cD - fD # getting smaller as turing left
-            k  = (maxV - minV)/90  # ratio between degree and speed
-            if needD >= 0:
-                direct = 1
-            else:
-                direct = -1
-
-            speed_turn  = (needD*k + minV*direct) # start from maxv, end at minv
+            speed_turn  = v 
             self.myRobot.tankDrive(-speed_turn, speed_turn)
             # print ("nD " + str(needD)) 
             # print ("speed " + str(speed_turn))
+        else:
+            self.myRobot.tankDrive(0,0)
             
-            
-        self.myRobot.tankDrive(0,0)
+        
 
         
     def disabledInit(self):
