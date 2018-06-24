@@ -55,24 +55,27 @@ class MyRobot(wpilib.IterativeRobot):
 
     def autonomousPeriodic(self):
         # This program tests 90 degree turn with gyro
-        global firstTime
+        global firstTime, fD, fastD, fastV, slowV, error
         if firstTime:
             sD = self.gyro.getAngle()
             fD = sD - 90
             firstTime = False
-            fastV = 0.7
-            slowV = 0.6
-            fastD = 80
+            fastV = 0.78
+            slowV = 0.64
+            fastD = 75
+            error = 6
 
         cD = self.gyro.getAngle()
         # left smaller right bigger
-        if cD != fD:
+        if cD > fD - error:
             cD = self.gyro.getAngle()
             needD  = cD - fD # getting smaller as turing left
-            if needD >= fastD:
+            if needD >= 90 - fastD:
                 speed_turn = fastV
+                print('fast')
             else:
                 speed_turn = slowV
+                print('slow')
             
             self.myRobot.tankDrive(-speed_turn, speed_turn)
         else:
