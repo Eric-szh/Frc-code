@@ -62,8 +62,8 @@ class MyRobot(wpilib.IterativeRobot):
             fD = sD - 90
             fluc = 0.5
             firstTime = False
-            maxV = 0.7
-            minV = 0.6
+            maxV = 0.75
+            minV = 0.65
 
         cD = self.gyro.getAngle()
         # left smaller right bigger
