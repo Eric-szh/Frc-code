@@ -58,24 +58,22 @@ class MyRobot(wpilib.IterativeRobot):
         global firstTime, fD, fastD, fastV, slowV, error
         if firstTime:
             sD = self.gyro.getAngle()
-            fD = sD - 90
+            fD = sD - 90# sD起始角度，fD最终角度，cD当前角度
             firstTime = False
             fastV = 0.78
             slowV = 0.64
             fastD = 75
-            error = 6
+            error = 6 #写好一系列参数
 
         cD = self.gyro.getAngle()
-        # left smaller right bigger
+        #在这里，往左转角度会逐渐变小，往右转会变大
         if cD > fD - error:
             cD = self.gyro.getAngle()
-            needD  = cD - fD # getting smaller as turing left
-            if needD >= 90 - fastD:
+            needD  = cD - fD #需要选择的角度，会越来越小
+            if needD >= 90 - fastD: #两档，快档，慢档
                 speed_turn = fastV
-                print('fast')
             else:
                 speed_turn = slowV
-                print('slow')
             
             self.myRobot.tankDrive(-speed_turn, speed_turn)
         else:
