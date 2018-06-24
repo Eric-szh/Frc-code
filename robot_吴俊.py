@@ -55,34 +55,30 @@ class MyRobot(wpilib.IterativeRobot):
 
     def autonomousPeriodic(self):
         # This program tests 90 degree turn with gyro
-        global firstTime, maxV, minV
-        while firstTime:
-            global fD, fluc, sD
+        global firstTime
+        if firstTime:
             sD = self.gyro.getAngle()
             fD = sD - 90
-            fluc = 0.5
             firstTime = False
-            maxV = 0.7
-            minV = 0.6
+            fastV = 0.7
+            slowV = 0.6
+            fastD = 80
 
         cD = self.gyro.getAngle()
         # left smaller right bigger
-        while cD > (fD + fluc) or cD < (fD - fluc) :
+        if cD != fD:
             cD = self.gyro.getAngle()
             needD  = cD - fD # getting smaller as turing left
-            k  = (maxV - minV)/90  # ratio between degree and speed
-            if needD >= 0:
-                direct = 1
+            if needD >= fastD:
+                speed_turn = fastV
             else:
-                direct = -1
-
-            speed_turn  = (needD*k + minV*direct) # start from maxv, end at minv
+                speed_turn = slowV
+            
             self.myRobot.tankDrive(-speed_turn, speed_turn)
-            # print ("nD " + str(needD)) 
-            # print ("speed " + str(speed_turn))
+        else:
+            self.myRobot.tankDrive(0,0)
             
             
-        self.myRobot.tankDrive(0,0)
 
         
     def disabledInit(self):
