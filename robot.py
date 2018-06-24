@@ -70,10 +70,10 @@ class MyRobot(wpilib.IterativeRobot):
             cD = self.gyro.getAngle()
             speed_turn  = v 
             self.myRobot.tankDrive(-speed_turn, speed_turn)
-            # print ("nD " + str(needD)) 
-            # print ("speed " + str(speed_turn))
+            print(cD)
         else:
             self.myRobot.tankDrive(0,0)
+
             
         
 
