@@ -57,7 +57,7 @@ class MyRobot(wpilib.IterativeRobot):
         # This program tests 90 degree turn with gyro
         global firstTime, maxV, minV
         while firstTime:
-            global fD, fluc, sD
+            global fD, fluc, sD, v
             sD = self.gyro.getAngle()
             fD = sD - 90
             firstTime = False
