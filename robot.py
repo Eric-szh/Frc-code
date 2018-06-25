@@ -101,29 +101,35 @@ class MyRobot(wpilib.IterativeRobot):
 
     def teleopPeriodic(self):
         if self.isOperatorControl() and self.isEnabled():
-            threshold = 0.3#机器人能开的速度
-            slow = 0.5
-            
+            threshold = 0.4#机器人能开的速度
+            slow = 0.7
+            current_speed = 0
+            deadband = 0.1
+            stering_mutiplier = 1.3 #越大，转弯越慢
+
             forward = self.Stick1.getTriggerAxis(1)
             backward = self.Stick1.getTriggerAxis(0)
-            steering = (self.Stick1.getX(0)) / 1.3
+            steering = (self.Stick1.getX(0)) / stering_mutiplier
             
             sum_speed = forward - backward
             
             
-            if abs(sum_speed) < slow: #sum_speed vaires from 0-0.5
-                calculated_speed = sum_speed*((slow - threshold) / slow) + threshold #speed varies from 0.3-0.5
-            if abs(sum_speed) > slow:
+            if ((abs(sum_speed) < slow) and (abs(sum_speed) > deadband)): #sum_speed vaires from 0-0.5
+                calculated_speed = sum_speed*((slow - threshold) / slow) + threshold
+                print("233") 
+            elif abs(sum_speed) > slow:
                 calculated_speed = sum_speed
+            else:
+                calculated_speed = 0
+     
+            print("sum " + str(sum_speed))
+            print("speed " + str(calculated_speed))
+
             
-            difference = calculated_speed - current_speed 
-            #positive if going forward, negative if going backward 
-            
-            if calculated_speed != current_speed:
-                assigined_speed = current_speed + 1/2*difference
-                current_speed = assigined_speed
-            
-            self.myRobot.tankDrive(assigined_speed - steering, assigined_speed + steering)
+
+
+
+            self.myRobot.tankDrive(calculated_speed + steering, calculated_speed - steering)
 
 
            
