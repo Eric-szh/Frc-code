@@ -112,17 +112,23 @@ class MyRobot(wpilib.IterativeRobot):
             backward = self.Stick1.getTriggerAxis(0)
             sum_speed = forward - backward
 
-            if sum_speed > deadband:
+            if abs(sum_speed) > deadband_forward:#如果开的话转弯变慢
                 stering_mutiplier = 1.5
             else:
                 stering_mutiplier = 1.3
 
-            steering = (self.Stick1.getX(0)) / stering_mutiplier
+            steering = (self.Stick1.getX(0)) / stering_mutiplier#算转弯
             
+            if abs(steering) < deadband_steering:#转弯的deadband
+                steering = 0
             
-            if ((abs(sum_speed) < slow) and (abs(sum_speed) > deadband_forward)): #sum_speed vaires from 0-0.5
-                calculated_speed = sum_speed*((slow - threshold) / slow) + threshold
-                print("233") 
+            if sum_speed >= 0:#算前进方向
+                direct = 1
+            elif sum_speed < 0 
+                direct = -1
+
+            if ((abs(sum_speed) < slow) and (abs(sum_speed) > deadband_forward)): #多档控制
+                calculated_speed = sum_speed*((slow - threshold) / slow) + threshold*direct
             elif abs(sum_speed) > slow:
                 calculated_speed = sum_speed
             else:
