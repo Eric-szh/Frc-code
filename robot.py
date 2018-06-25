@@ -102,26 +102,34 @@ class MyRobot(wpilib.IterativeRobot):
     def teleopPeriodic(self):
         if self.isOperatorControl() and self.isEnabled():
             threshold = 0.4#机器人能开的速度
-            slow = 0.7
+            slow = 0.7#将这个以下的速度精细控制
             current_speed = 0
-            deadband = 0.1
-            stering_mutiplier = 1.3 #越大，转弯越慢
+            deadband_forward = 0.1#向前的deadband
+            deadband_steering = 0.1#转弯的deadband
+            stering_mutiplier = 1.3#越大，转弯越慢
 
             forward = self.Stick1.getTriggerAxis(1)
             backward = self.Stick1.getTriggerAxis(0)
+            sum_speed = forward - backward
+
+            if sum_speed > deadband:
+                stering_mutiplier = 1.5
+            else:
+                stering_mutiplier = 1.3
+
             steering = (self.Stick1.getX(0)) / stering_mutiplier
             
-            sum_speed = forward - backward
             
-            
-            if ((abs(sum_speed) < slow) and (abs(sum_speed) > deadband)): #sum_speed vaires from 0-0.5
+            if ((abs(sum_speed) < slow) and (abs(sum_speed) > deadband_forward)): #sum_speed vaires from 0-0.5
                 calculated_speed = sum_speed*((slow - threshold) / slow) + threshold
                 print("233") 
             elif abs(sum_speed) > slow:
                 calculated_speed = sum_speed
             else:
                 calculated_speed = 0
+            
      
+
             print("sum " + str(sum_speed))
             print("speed " + str(calculated_speed))
 
