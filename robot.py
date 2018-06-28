@@ -102,7 +102,7 @@ class MyRobot(wpilib.IterativeRobot):
         self.myRobot.setSafetyEnabled(True)
         self.iSolenoid.set(1)
         self.gyro.setDeadband(1)
-        self.gyro.calibrate
+        self.gyro.calibrate()
         print('calibrated')
 
 
