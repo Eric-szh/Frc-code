@@ -37,7 +37,8 @@ class MyRobot(wpilib.IterativeRobot):
         self.aSolenoidHigh = wpilib.DoubleSolenoid(0,1)
         self.iSolenoid = wpilib.DoubleSolenoid(4,5)
 
-        self.gyro = wpilib.ADXRS450_Gyro()
+        self.gyro = wpilib.AnalogGyro(0)
+
 
 
 
@@ -100,7 +101,10 @@ class MyRobot(wpilib.IterativeRobot):
         '''Execute at the start of teleop mode'''
         self.myRobot.setSafetyEnabled(True)
         self.iSolenoid.set(1)
-        lastspeed = 0
+        self.gyro.setDeadband(1)
+        self.gyro.calibrate
+        print('calibrated')
+
 
     def teleopPeriodic(self):
         if self.isOperatorControl() and self.isEnabled():
@@ -111,16 +115,15 @@ class MyRobot(wpilib.IterativeRobot):
             deadband_steering = 0.1#转弯的deadband
             stering_mutiplier = 1.3#越大，转弯越慢
 
+            
             forward = self.Stick1.getTriggerAxis(1)
             backward = self.Stick1.getTriggerAxis(0)
             sum_speed = forward - backward
 
             if abs(sum_speed) > deadband_forward:#如果开的话转弯变慢
                 stering_mutiplier = 2.0
-                print("slow turn")
             else:
                 stering_mutiplier = 1.3
-                print("fast turn")
 
             steering = (self.Stick1.getX(0)) / stering_mutiplier#算转弯
             
@@ -143,7 +146,7 @@ class MyRobot(wpilib.IterativeRobot):
             
 
 
-
+            print(self.gyro.getAngle())
             self.myRobot.tankDrive(calculated_speed + steering, calculated_speed - steering)
 
 
