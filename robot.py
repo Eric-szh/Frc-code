@@ -101,9 +101,12 @@ class MyRobot(wpilib.IterativeRobot):
         '''Execute at the start of teleop mode'''
         self.myRobot.setSafetyEnabled(True)
         self.iSolenoid.set(1)
-        self.gyro.setDeadband(1)
+        self.gyro.setDeadband(0.1)
         self.gyro.calibrate()
         print('calibrated')
+
+
+        
 
 
     def teleopPeriodic(self):
@@ -142,15 +145,14 @@ class MyRobot(wpilib.IterativeRobot):
             else:
                 calculated_speed = 0
             
-
-            
-
-
             print(self.gyro.getAngle())
             self.myRobot.tankDrive(calculated_speed + steering, calculated_speed - steering)
 
+        def testInit(self):
+            pass
 
-           
+        def testPeriodic(self):
+            pass
 
 
 
