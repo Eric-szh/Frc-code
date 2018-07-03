@@ -1,4 +1,4 @@
-import wpilib, time
+import wpilib
 from wpilib.drive import DifferentialDrive
 
 
@@ -37,7 +37,10 @@ class MyRobot(wpilib.IterativeRobot):
         self.aSolenoidHigh = wpilib.DoubleSolenoid(0,1)
         self.iSolenoid = wpilib.DoubleSolenoid(4,5)
 
-        self.gyro = wpilib.ADXRS450_Gyro()
+        self.gyro = wpilib.AnalogGyro(0)
+
+
+
 
     def autonomousInit(self):
         self.iSolenoid.set(2)
@@ -55,7 +58,6 @@ class MyRobot(wpilib.IterativeRobot):
 
     def autonomousPeriodic(self):
         # This program tests 90 degree turn with gyro
-        print(time.time())
         global firstTime, fD, fastD, fastV, slowV, error
         if firstTime:
             sD = self.gyro.getAngle()
@@ -64,7 +66,7 @@ class MyRobot(wpilib.IterativeRobot):
             fastV = 0.78
             slowV = 0.64
             fastD = 75
-            error = 6
+            error = 0
 
         cD = self.gyro.getAngle()
         # left smaller right bigger
@@ -73,14 +75,16 @@ class MyRobot(wpilib.IterativeRobot):
             needD  = cD - fD # getting smaller as turing left
             if needD >= 90 - fastD:
                 speed_turn = fastV
+                print('fast')
             else:
-                speed_turn = slowV            
+                speed_turn = slowV
+                print('slow')
+            
             self.myRobot.tankDrive(-speed_turn, speed_turn)
+            print(cD)
         else:
             self.myRobot.tankDrive(0,0)
-        print(time.time())
-
-
+            
             
 
         
@@ -97,7 +101,14 @@ class MyRobot(wpilib.IterativeRobot):
         '''Execute at the start of teleop mode'''
         self.myRobot.setSafetyEnabled(True)
         self.iSolenoid.set(1)
-        lastspeed = 0
+        
+        self.gyro.calibrate()
+        self.gyro.setDeadband(0.1)
+        print('calibrated')
+
+
+        
+
 
     def teleopPeriodic(self):
         if self.isOperatorControl() and self.isEnabled():
@@ -108,12 +119,13 @@ class MyRobot(wpilib.IterativeRobot):
             deadband_steering = 0.1#转弯的deadband
             stering_mutiplier = 1.3#越大，转弯越慢
 
+            
             forward = self.Stick1.getTriggerAxis(1)
             backward = self.Stick1.getTriggerAxis(0)
             sum_speed = forward - backward
 
             if abs(sum_speed) > deadband_forward:#如果开的话转弯变慢
-                stering_mutiplier = 1.5
+                stering_mutiplier = 2.0
             else:
                 stering_mutiplier = 1.3
 
@@ -124,7 +136,7 @@ class MyRobot(wpilib.IterativeRobot):
             
             if sum_speed >= 0:#算前进方向
                 direct = 1
-            elif sum_speed < 0 
+            elif sum_speed < 0: 
                 direct = -1
 
             if ((abs(sum_speed) < slow) and (abs(sum_speed) > deadband_forward)): #多档控制
@@ -134,19 +146,14 @@ class MyRobot(wpilib.IterativeRobot):
             else:
                 calculated_speed = 0
             
-     
-
-            print("sum " + str(sum_speed))
-            print("speed " + str(calculated_speed))
-
-            
-
-
-
+            print(self.gyro.getAngle())
             self.myRobot.tankDrive(calculated_speed + steering, calculated_speed - steering)
 
+        def testInit(self):
+            pass
 
-           
+        def testPeriodic(self):
+            pass
 
 
 

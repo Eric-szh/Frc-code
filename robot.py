@@ -1,4 +1,4 @@
-import wpilib
+import wpilib, time
 from wpilib.drive import DifferentialDrive
 
 
@@ -37,10 +37,7 @@ class MyRobot(wpilib.IterativeRobot):
         self.aSolenoidHigh = wpilib.DoubleSolenoid(0,1)
         self.iSolenoid = wpilib.DoubleSolenoid(4,5)
 
-        self.gyro = wpilib.AnalogGyro(0)
-
-
-
+        self.gyro = wpilib.ADXRS450_Gyro()
 
     def autonomousInit(self):
         self.iSolenoid.set(2)
@@ -50,41 +47,56 @@ class MyRobot(wpilib.IterativeRobot):
         global timer
         timer = wpilib.Timer()
         timer.start()
-        global firstTime 
-        firstTime = True
-
+        global fD, fastD, fastV, slowV, error, firsttime
+        fastV = 0.78
+        slowV = 0.64
+        fastD = 75
+        error = 4
+        firsttime = 1
+        global turn
         
+
+        def turn(direction):
+            if direction == 'right':
+                direct = -1
+            elif direction == 'left':
+                direct = 1
+            else:
+                print('what the ghost')
+    
+            sD = self.gyro.getAngle()
+            fD = sD - 90*direct
+    
+            while 1:
+                cD = self.gyro.getAngle()
+                print(direct)
+                if cD > fD - error:
+                    needD  = cD*direct - fD*direct # getting smaller as turing left
+                    if needD >= 90 - fastD:
+                        speed_turn = fastV
+                    else:
+                        speed_turn = slowV            
+                    self.myRobot.tankDrive(-speed_turn*direct, speed_turn*direct)
+                else:
+                    self.myRobot.tankDrive(0,0)
+                    break    
+
+
 
 
     def autonomousPeriodic(self):
-        # This program tests 90 degree turn with gyro
-        global firstTime, fD, fastD, fastV, slowV, error
-        if firstTime:
-            sD = self.gyro.getAngle()
-            fD = sD - 90
-            firstTime = False
-            fastV = 0.78
-            slowV = 0.64
-            fastD = 75
-            error = 0
+        global fD, fastD, fastV, slowV, error, firsttime
+        
+        if firsttime:
+            firsttime = 0
+            turn('left')
+            print('4')
+            turn('left')
 
-        cD = self.gyro.getAngle()
-        # left smaller right bigger
-        if cD > fD - error:
-            cD = self.gyro.getAngle()
-            needD  = cD - fD # getting smaller as turing left
-            if needD >= 90 - fastD:
-                speed_turn = fastV
-                print('fast')
-            else:
-                speed_turn = slowV
-                print('slow')
-            
-            self.myRobot.tankDrive(-speed_turn, speed_turn)
-            print(cD)
-        else:
-            self.myRobot.tankDrive(0,0)
-            
+        
+        
+
+
             
 
         
@@ -101,13 +113,7 @@ class MyRobot(wpilib.IterativeRobot):
         '''Execute at the start of teleop mode'''
         self.myRobot.setSafetyEnabled(True)
         self.iSolenoid.set(1)
-        self.gyro.setDeadband(0.1)
-        self.gyro.calibrate()
-        print('calibrated')
-
-
-        
-
+        lastspeed = 0
 
     def teleopPeriodic(self):
         if self.isOperatorControl() and self.isEnabled():
@@ -118,13 +124,12 @@ class MyRobot(wpilib.IterativeRobot):
             deadband_steering = 0.1#转弯的deadband
             stering_mutiplier = 1.3#越大，转弯越慢
 
-            
             forward = self.Stick1.getTriggerAxis(1)
             backward = self.Stick1.getTriggerAxis(0)
             sum_speed = forward - backward
 
             if abs(sum_speed) > deadband_forward:#如果开的话转弯变慢
-                stering_mutiplier = 2.0
+                stering_mutiplier = 1.5
             else:
                 stering_mutiplier = 1.3
 
@@ -145,14 +150,19 @@ class MyRobot(wpilib.IterativeRobot):
             else:
                 calculated_speed = 0
             
-            print(self.gyro.getAngle())
+     
+
+            print("sum " + str(sum_speed))
+            print("speed " + str(calculated_speed))
+
+            
+
+
+
             self.myRobot.tankDrive(calculated_speed + steering, calculated_speed - steering)
 
-        def testInit(self):
-            pass
 
-        def testPeriodic(self):
-            pass
+           
 
 
 
